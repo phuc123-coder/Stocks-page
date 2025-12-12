@@ -3,22 +3,53 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Finance Homepage</title>
+  <title>Stocks+ | Homepage</title>
   <link rel="stylesheet" href="home.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+
 <body>
+  <div class="menu-header">
+
+    <span class="white">Stocks</span><span class="green">+</span>
+
+    <div class="search-box">
+      <input id="symbol" type="text" placeholder="Search for news, tickers or companies">
+      <button id="searchBtn" class="search-button"><i class="search-icon">🔍</i></button>
+    </div>
+
+    <nav class="nav-links">
+      <a href="#" class="active">Finance</a>
+      <a href="#">News</a>
+      <a href="#">Sports</a>
+      <a href="#">More ▼</a>
+    </nav>
+
+    <a href="login.html" class="login_button">Log in</a>
+
+  </div>
 
   <div id="homepage">
 
-    <section class="featured" id="featured"></section>
+    <!-- LEFT COLUMN: NEWS -->
+    <div id="news-section" class="news-wrapper">
+      <section class="featured" id="featured"></section>
 
-    <section class="news-grid" id="newsGrid"></section>
+      <section class="news-grid" id="newsGrid"></section>
+    </div>
 
+    <!-- SEARCH RESULT PANEL (hidden by default) -->
+    <div id="searchResultPanel" class="search-panel" style="display:none;">
+      <div id="info" class="search-info"></div>
+      <canvas id="stockChart" style="margin-top:25px; max-width:800px;"></canvas>
+    </div>
+
+    <!-- RIGHT SIDEBAR: TOP MOVERS -->
     <section class="stock-sidebar">
-      <h3>Top 5 Gainers</h3>
+      <h3>Top Gainers</h3>
       <ul id="gainers"></ul>
 
-      <h3>Top 5 Losers</h3>
+      <h3>Top Losers</h3>
       <ul id="losers"></ul>
 
       <h3>Most Active</h3>
