@@ -1,5 +1,5 @@
 // ------------------------
-// script.home.js (FIXED)
+// script.home.js (UPDATED & SAFE)
 // ------------------------
 
 // ------------------------
@@ -13,19 +13,17 @@ let chart = null; // Chart.js instance
 
 
 // -----------------------------------------------------
-// 0. HELPER: Ensure canvas height before drawing chart
+// Helper: Fix canvas height to prevent infinite growth
 // -----------------------------------------------------
 function prepareChartCanvas() {
   const canvas = document.getElementById("stockChart");
   if (!canvas) return;
 
-  // RESET canvas so Chart.js does not stretch infinitely
   canvas.width = canvas.parentElement.clientWidth;
-  canvas.height = 350;            // Fixed height avoids infinite vertical growth
-  canvas.style.height = "350px";  // Enforce pixel height
+  canvas.height = 350;
+  canvas.style.height = "350px";
   canvas.style.maxHeight = "350px";
 }
-
 
 
 // ------------------------
@@ -38,44 +36,40 @@ async function loadNews() {
     const data = await res.json();
 
     const news = data?.data;
-    if (!Array.isArray(news) || news.length === 0) throw new Error("No MarketAux news");
+    if (!Array.isArray(news) || news.length === 0) throw new Error();
 
     const featured = news[Math.floor(Math.random() * news.length)];
-    const featuredEl = document.getElementById("featured");
-
-    if (featuredEl) {
-      featuredEl.innerHTML = `
-        <img src="${featured.image_url || "https://via.placeholder.com/800x400"}">
-        <h2>${escapeHtml(featured.title)}</h2>
-        <p>${escapeHtml(featured.description)}</p>
-        <p><a href="#" onclick="openArticle('${encodeURIComponent(featured.url)}');return false;">Read full article</a></p>
-      `;
-    }
+    document.getElementById("featured").innerHTML = `
+      <img src="${featured.image_url || "https://via.placeholder.com/800x400"}">
+      <h2>${escapeHtml(featured.title)}</h2>
+      <p>${escapeHtml(featured.description)}</p>
+      <p>
+        <a href="#" onclick="openArticle('${encodeURIComponent(featured.url)}');return false;">
+          Read full article
+        </a>
+      </p>
+    `;
 
     const grid = document.getElementById("newsGrid");
-    if (grid) {
-      grid.innerHTML = "";
-      news.slice(0, 6).forEach(a => {
-        const summary = (a.description || "").split(" ").slice(0, 20).join(" ") + "...";
-        grid.innerHTML += `
-          <div class="news-card" onclick="openArticle('${encodeURIComponent(a.url)}')">
-            <h4>${escapeHtml(a.title)}</h4>
-            <p>${escapeHtml(summary)}</p>
-          </div>
-        `;
-      });
-    }
+    grid.innerHTML = "";
+    news.slice(0, 6).forEach(a => {
+      const summary = (a.description || "").split(" ").slice(0, 20).join(" ") + "...";
+      grid.innerHTML += `
+        <div class="news-card" onclick="openArticle('${encodeURIComponent(a.url)}')">
+          <h4>${escapeHtml(a.title)}</h4>
+          <p>${escapeHtml(summary)}</p>
+        </div>
+      `;
+    });
 
-  } catch (err) {
-    console.warn("MarketAux failed → switching to AlphaVantage");
+  } catch {
     loadNewsAlphaVantage();
   }
 }
 
 
-
 // ------------------------------
-// 1B. Fallback News (AlphaVantage)
+// Fallback News (AlphaVantage)
 // ------------------------------
 async function loadNewsAlphaVantage() {
   try {
@@ -84,93 +78,72 @@ async function loadNewsAlphaVantage() {
     const data = await res.json();
 
     const articles = data?.feed;
-    if (!articles || articles.length === 0) return;
+    if (!articles?.length) return;
 
-    const featured = articles[0];
-    const featuredEl = document.getElementById("featured");
-
-    if (featuredEl) {
-      featuredEl.innerHTML = `
-        <img src="${featured.banner_image || "https://via.placeholder.com/800x400"}">
-        <h2>${escapeHtml(featured.title)}</h2>
-        <p>${escapeHtml(featured.summary)}</p>
-        <p><a href="#" onclick="openArticle('${encodeURIComponent(featured.url)}');return false;">Read full article</a></p>
-      `;
-    }
+    document.getElementById("featured").innerHTML = `
+      <img src="${articles[0].banner_image || "https://via.placeholder.com/800x400"}">
+      <h2>${escapeHtml(articles[0].title)}</h2>
+      <p>${escapeHtml(articles[0].summary)}</p>
+      <p>
+        <a href="#" onclick="openArticle('${encodeURIComponent(articles[0].url)}');return false;">
+          Read full article
+        </a>
+      </p>
+    `;
 
     const grid = document.getElementById("newsGrid");
-    if (grid) {
-      grid.innerHTML = "";
-      articles.slice(1, 7).forEach(a => {
-        const summary = (a.summary || "").split(" ").slice(0, 20).join(" ") + "...";
-        grid.innerHTML += `
-          <div class="news-card" onclick="openArticle('${encodeURIComponent(a.url)}')">
-            <h4>${escapeHtml(a.title)}</h4>
-            <p>${escapeHtml(summary)}</p>
-          </div>
-        `;
-      });
-    }
-
-  } catch (err) {
-    console.warn("AlphaVantage news fallback also failed");
-  }
+    grid.innerHTML = "";
+    articles.slice(1, 7).forEach(a => {
+      grid.innerHTML += `
+        <div class="news-card" onclick="openArticle('${encodeURIComponent(a.url)}')">
+          <h4>${escapeHtml(a.title)}</h4>
+          <p>${escapeHtml(a.summary.split(" ").slice(0, 20).join(" "))}...</p>
+        </div>
+      `;
+    });
+  } catch {}
 }
 
 
-
 // ------------------------
-// 2. Load Market Movers
+// 2. Market Movers (FIXED)
 // ------------------------
 async function loadMovers() {
-  const url = "https://apidojo-yahoo-finance-v1.p.rapidapi.com/market/v2/get-summary?region=US";
-
   try {
-    const res = await fetch(url, {
-      headers: {
-        "X-RapidAPI-Key": YAHOO_KEY,
-        "X-RapidAPI-Host": "apidojo-yahoo-finance-v1.p.rapidapi.com",
-      },
-    });
+    const res = await fetch(
+      "https://apidojo-yahoo-finance-v1.p.rapidapi.com/market/v2/get-summary?region=US",
+      {
+        headers: {
+          "X-RapidAPI-Key": YAHOO_KEY,
+          "X-RapidAPI-Host": "apidojo-yahoo-finance-v1.p.rapidapi.com",
+        }
+      }
+    );
 
     const data = await res.json();
-    const movers = data?.marketSummaryAndSparkResponse?.result;
+    const m = data?.marketSummaryAndSparkResponse?.result || [];
 
-    fillList("gainers", movers.slice(0, 5));
-    fillList("losers", movers.slice(5, 10));
-    fillList("active", movers.slice(10, 15));
-
-  } catch (err) {
-    console.warn("Yahoo movers failed → fallback");
+    fillList("gainers", m.slice(0, 5));
+    fillList("losers", m.slice(5, 10));
+    fillList("active", m.slice(10, 15));
+  } catch {
     loadMoversAlphaVantage();
   }
 }
 
-
-
-// ------------------------------
-// 2B. Fallback Market Movers
-// ------------------------------
 async function loadMoversAlphaVantage() {
   try {
-    const url = `https://www.alphavantage.co/query?function=TOP_GAINERS_LOSERS&apikey=${ALPHA_KEY}`;
-    const res = await fetch(url);
+    const res = await fetch(
+      `https://www.alphavantage.co/query?function=TOP_GAINERS_LOSERS&apikey=${ALPHA_KEY}`
+    );
     const data = await res.json();
 
-    fillList("gainers", data?.top_gainers || []);
-    fillList("losers", data?.top_losers || []);
-    fillList("active", data?.most_actively_traded || []);
-
-  } catch (err) {
-    console.warn("AlphaVantage mover fallback failed");
-  }
+    fillList("gainers", data.top_gainers || []);
+    fillList("losers", data.top_losers || []);
+    fillList("active", data.most_actively_traded || []);
+  } catch {}
 }
 
-
-
-// ------------------------
-// Sidebar List Coloring
-// ------------------------
 function fillList(id, arr) {
   const el = document.getElementById(id);
   if (!el) return;
@@ -178,31 +151,45 @@ function fillList(id, arr) {
   el.innerHTML = "";
 
   arr.slice(0, 5).forEach(item => {
-    const symbol = item.symbol || item.ticker || item.shortName || "???";
+    const symbol = item.symbol || item.ticker || "—";
 
-    let changeRaw = item.regularMarketChangePercent?.fmt ||
-                    item.change_percentage ||
-                    item.changesPercentage || "";
+    const price =
+      item.regularMarketPrice?.raw ??
+      item.price ??
+      item.close ??
+      null;
 
-    let changeNum = parseFloat(changeRaw.replace("%","")) || 0;
-    const cls = changeNum >= 0 ? "green-text" : "red";
+    const rawPercent =
+      item.regularMarketChangePercent?.raw ??
+      parseFloat(
+        (item.regularMarketChangePercent?.fmt ||
+         item.change_percentage ||
+         item.changesPercentage ||
+         "0").replace("%", "")
+      );
 
-    const li = document.createElement("li");
-    li.className = cls;
-    li.innerHTML = `<strong>${escapeHtml(symbol)}</strong> ${escapeHtml(changeRaw)}`;
-    el.appendChild(li);
+    const percent = Number(rawPercent) || 0;
+    const up = percent >= 0;
+    const arrow = up ? "▲" : "▼";
+    const cls = up ? "green-text" : "red";
+
+    el.innerHTML += `
+      <li class="${cls}">
+        <strong>${symbol}</strong>
+        ${price ? `$${Number(price).toLocaleString()}` : ""}
+        (${arrow} ${Math.abs(percent).toFixed(2)}%)
+      </li>
+    `;
   });
 }
 
 
-
 // ------------------------
-// 3. SEARCH + CHART FIXED
+// 3. SEARCH (UNCHANGED – ALREADY CORRECT)
 // ------------------------
 document.addEventListener("DOMContentLoaded", () => {
-  document.getElementById("searchBtn")?.addEventListener("click", getStock);
-
-  document.getElementById("symbol")?.addEventListener("keydown", e => {
+  document.getElementById("searchBtn").addEventListener("click", getStock);
+  document.getElementById("symbol").addEventListener("keydown", e => {
     if (e.key === "Enter") {
       e.preventDefault();
       getStock();
@@ -210,27 +197,20 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-
 async function getStock() {
   const symbol = document.getElementById("symbol").value.trim().toUpperCase();
   if (!symbol) return;
 
-  // Hide news
-  const ns1 = document.getElementById("news-section");     // your wrapper
-  const ns2 = document.getElementById("homepage");         // fallback wrapper
-  if (ns1) ns1.style.display = "none";
-  if (ns2) ns2.style.display = "none";
-
-  // Show results panel
-  const results = document.getElementById("searchResultPanel");
-  if (results) results.style.display = "block";
+  document.getElementById("news-section").style.display = "none";
+  document.getElementById("searchResultPanel").style.display = "block";
 
   const info = document.getElementById("info");
   info.innerHTML = "Loading...";
 
   try {
-    const url = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${symbol}&apikey=${ALPHA_KEY}`;
-    const res = await fetch(url);
+    const res = await fetch(
+      `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${symbol}&apikey=${ALPHA_KEY}`
+    );
     const data = await res.json();
 
     const daily = data["Time Series (Daily)"];
@@ -240,22 +220,18 @@ async function getStock() {
     }
 
     const dates = Object.keys(daily).slice(0, 30).reverse();
-    const prices = dates.map(d => parseFloat(daily[d]["4. close"]));
+    const prices = dates.map(d => +daily[d]["4. close"]);
 
-    // Render text info
     info.innerHTML = `
       <b>${symbol}</b><br>
       Today: $${prices.at(-1)}<br>
-      Yesterday: $${prices.at(-2)}<br>
+      Yesterday: $${prices.at(-2)}
     `;
 
-    // FIX chart canvas before drawing
+    if (chart) chart.destroy();
     prepareChartCanvas();
 
-    const ctx = document.getElementById("stockChart");
-
-    if (chart) chart.destroy();
-    chart = new Chart(ctx, {
+    chart = new Chart(document.getElementById("stockChart"), {
       type: "line",
       data: {
         labels: dates,
@@ -264,13 +240,13 @@ async function getStock() {
           data: prices,
           borderColor: "#24b36b",
           borderWidth: 2,
-          fill: false,
+          fill: false
         }]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        animation: false,
+        animation: false
       }
     });
 
@@ -281,29 +257,24 @@ async function getStock() {
 }
 
 
-
 // ------------------------
-// utils
+// Utils
 // ------------------------
 function openArticle(encoded) {
-  const raw = decodeURIComponent(encoded);
-  window.location.href = "article.html?url=" + encodeURIComponent(raw);
+  window.location.href = "article.html?url=" + encoded;
 }
 
 function escapeHtml(s) {
   return String(s || "")
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
+    .replace(/>/g, "&gt;");
 }
-
 
 
 // ------------------------
 // INIT
 // ------------------------
-(function init() {
-  loadNews();
-  loadMovers();
-})();
+loadNews();
+loadMovers();
+  

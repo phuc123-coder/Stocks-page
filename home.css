@@ -1,6 +1,6 @@
-/* -------------------- */
-/* GENERAL */
-/* -------------------- */
+/* ============================
+   GENERAL
+============================ */
 
 body {
   margin: 0;
@@ -9,22 +9,9 @@ body {
   color: #ddd;
 }
 
-#homepage {
-  display: flex;
-  gap: 20px;
-  padding: 20px;
-}
-
-/* Slightly lighter containers */
-.panel {
-  background: #1a1a1a;
-  border-radius: 10px;
-  padding: 15px;
-}
-
-/* -------------------- */
-/* MENU */
-/* -------------------- */
+/* ============================
+   MENU (UNCHANGED SEARCH)
+============================ */
 
 .menu-header {
   display: flex;
@@ -34,8 +21,15 @@ body {
   gap: 25px;
 }
 
-.white { color: #ccc; font-size: 30px; }
-.green { color: #24b36b; font-size: 30px; }
+.white {
+  color: #ccc;
+  font-size: 30px;
+}
+
+.green {
+  color: #24b36b;
+  font-size: 30px;
+}
 
 .search-box {
   display: flex;
@@ -73,36 +67,57 @@ body {
   padding: 6px 10px;
 }
 
-.nav-links a.active { color: #38c172; }
+.nav-links a.active {
+  color: #38c172;
+}
 
-/* -------------------- */
-/* FEATURED NEWS */
-/* -------------------- */
+/* ============================
+   MAIN LAYOUT
+============================ */
+
+#homepage {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  max-width: 1400px;
+  margin: 20px auto;
+}
+
+/* ============================
+   NEWS SECTION
+============================ */
+
+.news-wrapper {
+  background: #151515;
+  border-radius: 14px 0 0 14px;
+  padding: 16px;
+}
+
+/* Featured article */
 
 .featured {
-  width: 100%;
-  background: #1b1b1b;
-  padding: 15px;
-  border-radius: 10px;
-  margin-bottom: 20px;
+  background: #1a1a1a;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 16px;
 }
 
 .featured img {
   width: 100%;
-  border-radius: 8px;
+  display: block;
 }
 
 .featured h2 {
-  color: #eee;
+  font-size: 24px;
+  color: #fff;
+  margin: 12px 0 6px;
 }
 
-/* -------------------- */
-/* NEWS GRID */
-/* -------------------- */
-
-.news-wrapper {
-  width: 55%;
+.featured p {
+  color: #aaa;
+  line-height: 1.4;
 }
+
+/* News grid */
 
 .news-grid {
   display: grid;
@@ -115,47 +130,78 @@ body {
   padding: 12px;
   border-radius: 10px;
   cursor: pointer;
-  transition: 0.2s;
+  transition: background 0.15s ease;
 }
 
 .news-card:hover {
   background: #242424;
 }
 
-/* -------------------- */
-/* SIDEBAR */
-/* -------------------- */
+.news-card h4 {
+  font-size: 18px;
+  color: #eee;
+  margin-bottom: 6px;
+}
+
+.news-card p {
+  font-size: 16px;
+  color: #aaa;
+}
+
+/* ============================
+   SIDEBAR (TOP GAINERS / LOSERS)
+============================ */
 
 .stock-sidebar {
-  width: 25%;
-  background: #1a1a1a;
-  padding: 15px;
-  border-radius: 10px;
+  background: #151515;
+  border-radius: 0 14px 14px 0;
+  padding: 16px;
+}
+
+.stock-sidebar h3 {
+  font-size: 16px;
+  color: #fff;
+  margin: 18px 0 10px;
 }
 
 .stock-sidebar ul {
   list-style: none;
   padding: 0;
+  margin: 0;
 }
 
 .stock-sidebar li {
-  padding: 6px 0;
-  border-bottom: 1px solid #333;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #2a2a2a;
 }
 
-/* Colors */
-.red { color: #e74c3c; }
-.green-text { color: #2ecc71; }
+/* ============================
+   STOCK CHANGE STYLING
+============================ */
 
-/* -------------------- */
-/* SEARCH RESULT PANEL */
-/* -------------------- */
-
-.search-panel {
-  width: 55%;
-  background: #1a1a1a;
-  padding: 20px;
-  border-radius: 10px;
+.stock-right {
+  text-align: right;
+  font-size: 14px;
 }
 
-.search-info b { font-size: 20px; }
+.stock-price {
+  color: #ddd;
+  font-size: 14px;
+}
+
+.stock-change {
+  font-size: 13px;
+  font-weight: bold;
+  margin-left: 6px;
+}
+
+.stock-change.up {
+  color: #2ecc71;
+}
+
+.stock-change.down {
+  color: #e74c3c;
+}
