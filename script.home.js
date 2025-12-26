@@ -80,26 +80,43 @@ async function loadMovers() {
   }
 }
 
-function fillList(id, list) {
-  const ul = document.getElementById(id);
-  ul.innerHTML = "";
+function fillList(id, arr) {
+  const el = document.getElementById(id);
+  if (!el) return;
 
-  list.slice(0, 5).forEach(stock => {
-    const change = parseFloat(stock.change_percentage.replace("%", ""));
-    const color = change >= 0 ? "green" : "red";
+  el.innerHTML = "";
 
-    ul.innerHTML += `
-      <li style="color:${color}">
-        <strong>${stock.ticker}</strong>
-        <span>${stock.change_percentage}</span>
+  arr.slice(0, 5).forEach(item => {
+    const symbol = item.ticker || item.symbol || "—";
+
+    // MOST ACTIVE → show volume
+    if (id === "active") {
+      const volume = Number(item.volume || 0).toLocaleString();
+      el.innerHTML += `
+        <li>
+          <strong>${symbol}</strong>
+          <span class="neutral-text">${volume}</span>
+        </li>
+      `;
+      return;
+    }
+
+    // GAINERS / LOSERS → show percentage
+    const raw = item.change_percentage || "0%";
+    const percent = parseFloat(raw);
+    const cls = percent >= 0 ? "green-text" : "red";
+    const arrow = percent >= 0 ? "▲" : "▼";
+
+    el.innerHTML += `
+      <li class="${cls}">
+        <strong>${symbol}</strong>
+        <span>${arrow} ${raw}</span>
       </li>
     `;
   });
 }
-
-
 // ------------------------
-// 3. SEARCH STOCK
+// 3. SEARCH STOCK (REPLACES FEATURED ONLY)
 // ------------------------
 document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("searchBtn").addEventListener("click", getStock);
@@ -115,12 +132,16 @@ async function getStock() {
   const symbol = document.getElementById("symbol").value.trim().toUpperCase();
   if (!symbol) return;
 
-  // Hide news, keep movers
-  document.getElementById("news-section").style.display = "none";
-  document.getElementById("searchResultPanel").style.display = "block";
+  const featured = document.getElementById("featured");
+
+  // Replace ONLY the headline article
+  featured.innerHTML = `
+    <h2>Loading ${symbol}...</h2>
+    <canvas id="stockChart"></canvas>
+    <div id="info"></div>
+  `;
 
   const info = document.getElementById("info");
-  info.textContent = "Loading...";
 
   try {
     const res = await fetch(
@@ -130,7 +151,7 @@ async function getStock() {
     const daily = data["Time Series (Daily)"];
 
     if (!daily) {
-      info.textContent = "No data found.";
+      featured.innerHTML = "<p>No stock data found.</p>";
       return;
     }
 
@@ -168,7 +189,7 @@ async function getStock() {
 
   } catch (err) {
     console.error("Search error:", err);
-    info.textContent = "Error loading stock data.";
+    featured.innerHTML = "<p>Error loading stock data.</p>";
   }
 }
 

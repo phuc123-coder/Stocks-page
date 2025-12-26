@@ -13,6 +13,12 @@ body {
    MENU (UNCHANGED SEARCH)
 ============================ */
 
+.login_button {
+  text-decoration: none;
+  color: #24b36b;
+  padding-right: 20px;
+}
+
 .menu-header {
   display: flex;
   align-items: center;
@@ -20,6 +26,8 @@ body {
   background: #111;
   gap: 25px;
 }
+
+
 
 .white {
   color: #ccc;
