@@ -27,7 +27,8 @@ body {
   gap: 25px;
 }
 
-
+.green-text { color: #22c55e; }
+.red { color: #ef4444; }
 
 .white {
   color: #ccc;
