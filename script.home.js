@@ -62,7 +62,7 @@ async function loadNews() {
 
 
 // ------------------------
-// 2. MARKET MOVERS (Alpha Vantage)
+// 2. MARKET MOVERS (Alpha Vantage) — FIXED
 // ------------------------
 async function loadMovers() {
   try {
@@ -71,9 +71,9 @@ async function loadMovers() {
     );
     const data = await res.json();
 
-    fillList("gainers", data.top_gainers || []);
-    fillList("losers", data.top_losers || []);
-    fillList("active", data.most_actively_traded || []);
+    fillList("gainers", data.top_gainers);
+    fillList("losers", data.top_losers);
+    fillList("active", data.most_actively_traded);
 
   } catch (err) {
     console.error("Movers error:", err);
@@ -82,39 +82,49 @@ async function loadMovers() {
 
 function fillList(id, arr) {
   const el = document.getElementById(id);
-  if (!el) return;
+  if (!el || !Array.isArray(arr)) return;
 
   el.innerHTML = "";
 
-  arr.slice(0, 5).forEach(item => {
-    const symbol = item.ticker || item.symbol || "—";
+  arr
+    // remove warrants / junk tickers
+    .filter(item => {
+      const sym = item.ticker || item.symbol || "";
+      return /^[A-Z]{1,5}$/.test(sym);
+    })
+    .slice(0, 8) // allow more rows, we’ll skip invalid ones
+    .forEach(item => {
+      const symbol = item.ticker || item.symbol || "—";
 
-    // MOST ACTIVE → show volume
-    if (id === "active") {
-      const volume = Number(item.volume || 0).toLocaleString();
-      el.innerHTML += `
-        <li>
+
+
+      // ========================
+      // GAINERS / LOSERS
+      // ========================
+      let raw = item.change_percentage || "0%";
+      let percent = parseFloat(
+        String(raw).replace("%", "").replace(/[^\d.-]/g, "")
+      );
+
+      if (Number.isNaN(percent)) percent = 0;
+      percent = Math.max(Math.min(percent, 999), -999);
+
+      const cls = percent >= 0 ? "green-text" : "red";
+      const arrow = percent >= 0 ? "▲" : "▼";
+
+      el.insertAdjacentHTML(
+        "beforeend",
+        `
+        <li class="${cls}">
           <strong>${symbol}</strong>
-          <span class="neutral-text">${volume}</span>
+          <span>${arrow} ${percent.toFixed(2)}%</span>
         </li>
-      `;
-      return;
-    }
-
-    // GAINERS / LOSERS → show percentage
-    const raw = item.change_percentage || "0%";
-    const percent = parseFloat(raw);
-    const cls = percent >= 0 ? "green-text" : "red";
-    const arrow = percent >= 0 ? "▲" : "▼";
-
-    el.innerHTML += `
-      <li class="${cls}">
-        <strong>${symbol}</strong>
-        <span>${arrow} ${raw}</span>
-      </li>
-    `;
-  });
+      `
+      );
+    });
 }
+
+
 // ------------------------
 // 3. SEARCH STOCK (REPLACES FEATURED ONLY)
 // ------------------------
@@ -190,6 +200,38 @@ async function getStock() {
   } catch (err) {
     console.error("Search error:", err);
     featured.innerHTML = "<p>Error loading stock data.</p>";
+  }
+}
+
+async function loadStockNews(symbol) {
+  try {
+    const res = await fetch(
+      `https://www.alphavantage.co/query?function=NEWS_SENTIMENT&tickers=${symbol}&apikey=${ALPHA_KEY}`
+    );
+
+    const data = await res.json();
+    const articles = data?.feed;
+
+    if (!articles || articles.length === 0) {
+      document.getElementById("newsGrid").innerHTML =
+        "<p>No related news found.</p>";
+      return;
+    }
+
+    const grid = document.getElementById("newsGrid");
+    grid.innerHTML = "";
+
+    articles.slice(0, 6).forEach(a => {
+      grid.innerHTML += `
+        <div class="news-card" onclick="openArticle('${encodeURIComponent(a.url)}')">
+          <h4>${escapeHtml(a.title)}</h4>
+          <p>${escapeHtml(a.summary.split(" ").slice(0, 20).join(" "))}...</p>
+        </div>
+      `;
+    });
+
+  } catch (err) {
+    console.error("Stock news failed", err);
   }
 }
 
