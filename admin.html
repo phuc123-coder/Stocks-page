@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin | Quản lý mã chứng khoán</title>
+
+    <!-- Bootstrap 5 -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+      crossorigin="anonymous"
+    />
+
+    <!-- Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+      integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+
+    <style>
+      body {
+        background-color: #f5f5f5;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          sans-serif;
+      }
+      .form-card {
+        border-radius: 0.75rem;
+      }
+      .status-pill {
+        border-radius: 999px;
+        padding: 0.15rem 0.6rem;
+        font-size: 0.75rem;
+      }
+    </style>
+  </head>
+
+  <body>
+    <nav class="navbar navbar-expand-lg bg-dark navbar-dark mb-4">
+      <div class="container">
+        <a
+          class="navbar-brand d-flex align-items-center gap-2"
+          href="./index.html"
+        >
+          <i class="fa-solid fa-chart-line"></i>
+          <span>Stocks+ Admin</span>
+        </a>
+        <div class="d-flex align-items-center gap-3">
+          <span id="admin-user-chip" class="badge bg-light text-dark d-none">
+            <i class="fa-regular fa-user"></i>
+            <span id="admin-user-name"></span>
+            <span class="badge bg-danger ms-1">ADMIN</span>
+          </span>
+          <button
+            id="btn-admin-logout"
+            class="btn btn-outline-light btn-sm"
+            type="button"
+          >
+            Đăng xuất
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <main class="container mb-4">
+      <div id="admin-alert" class="alert alert-warning d-none" role="alert"></div>
+
+      <div id="admin-content" class="row g-3 d-none">
+        <div class="col-lg-4">
+          <div class="card shadow-sm form-card">
+            <div class="card-body">
+              <h5 class="card-title mb-3" id="form-title">
+                <i class="fa-solid fa-pen-to-square me-1"></i> Thêm mã chứng khoán
+              </h5>
+
+              <form id="stock-form">
+                <input type="hidden" id="stock-id" />
+
+                <div class="mb-2">
+                  <label class="form-label">Mã chứng khoán (Symbol)</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="stock-symbol"
+                    placeholder="VD: AAPL"
+                    required
+                  />
+                </div>
+
+                <div class="mb-2">
+                  <label class="form-label">Tên công ty</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="stock-name"
+                    placeholder="VD: Apple Inc."
+                    required
+                  />
+                </div>
+
+                <div class="mb-2">
+                  <label class="form-label">Giá (VND)</label>
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="stock-price"
+                    min="0"
+                    step="1000"
+                    placeholder="VD: 65000"
+                    required
+                  />
+                </div>
+
+                <div class="mb-2">
+                  <label class="form-label">Ảnh (URL)</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="stock-image"
+                    placeholder="Link ảnh"
+                  />
+                </div>
+
+                <div class="mb-2">
+                  <label class="form-label">Danh mục</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="stock-category"
+                    placeholder="VD: Công nghệ, Tài chính..."
+                  />
+                </div>
+
+                <div class="mb-2">
+                  <label class="form-label">Mô tả</label>
+                  <textarea
+                    class="form-control"
+                    id="stock-description"
+                    rows="2"
+                    placeholder="Mô tả ngắn"
+                  ></textarea>
+                </div>
+
+                <div class="form-check form-switch mb-3">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    role="switch"
+                    id="stock-popular"
+                  />
+                  <label class="form-check-label" for="stock-popular">
+                    Mã phổ biến
+                  </label>
+                </div>
+
+                <div class="d-flex justify-content-between">
+                  <button type="submit" class="btn btn-primary" id="btn-save">
+                    Lưu
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-outline-secondary"
+                    id="btn-reset"
+                  >
+                    Làm mới
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <div class="mt-3 d-flex gap-2">
+            <button
+              id="btn-refresh"
+              class="btn btn-sm btn-outline-secondary w-100"
+              type="button"
+            >
+              <i class="fa-solid fa-rotate me-1"></i> Tải lại
+            </button>
+          </div>
+        </div>
+
+        <div class="col-lg-8">
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <div
+                class="d-flex justify-content-between align-items-center mb-2"
+              >
+                <div>
+                  <h5 class="card-title mb-0">
+                    <i class="fa-solid fa-list me-1"></i> Danh sách mã
+                  </h5>
+                  <small class="text-muted"
+                    >Dữ liệu lấy từ collection <code>stocks</code>.</small
+                  >
+                </div>
+              </div>
+
+              <div class="table-responsive">
+                <table class="table table-sm align-middle">
+                  <thead>
+                    <tr>
+                      <th>Ảnh</th>
+                      <th>Mã - Tên</th>
+                      <th>Giá</th>
+                      <th>Danh mục</th>
+                      <th>Hot</th>
+                      <th class="text-end">Thao tác</th>
+                    </tr>
+                  </thead>
+                  <tbody id="stocks-table-body"></tbody>
+                </table>
+              </div>
+
+              <div
+                id="stocks-empty"
+                class="text-center text-muted py-3 d-none"
+              >
+                Chưa có mã. Hãy thêm ở form bên trái.
+              </div>
+            </div>
+          </div>
+
+          <div class="card shadow-sm mt-3">
+            <div class="card-body">
+              <h5 class="card-title mb-2">
+                <i class="fa-solid fa-receipt me-1"></i> Đơn mua
+              </h5>
+              <div class="table-responsive">
+                <table class="table table-sm align-middle mb-0">
+                  <thead>
+                    <tr>
+                      <th>Mã</th>
+                      <th>Người mua</th>
+                      <th>Tổng tiền</th>
+                      <th>Trạng thái</th>
+                    </tr>
+                  </thead>
+                  <tbody id="admin-orders-table-body"></tbody>
+                </table>
+              </div>
+              <div
+                id="admin-orders-empty"
+                class="text-center text-muted py-3 d-none"
+              >
+                Chưa có đơn mua nào.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+      crossorigin="anonymous"
+    ></script>
+
+    <script type="module" src="./src/js/stocks-admin.js"></script>
+  </body>
+</html>
+

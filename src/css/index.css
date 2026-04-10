@@ -5,12 +5,12 @@
 body {
   margin: 0;
   font-family: Arial, sans-serif;
-  background: #0f0f0f;
+  background: #ddd;
   color: #ddd;
 }
 
 /* ============================
-   MENU (UNCHANGED SEARCH)
+   MENU 
 ============================ */
 
 .login_button {
@@ -22,16 +22,17 @@ body {
 .menu-header {
   display: flex;
   align-items: center;
-  padding: 15px 25px;
-  background: #111;
+  padding: 10px 20px;
+  background: #e5dddddd;
   gap: 25px;
+  border-radius: 0.75rem; 
 }
 
 .green-text { color: #22c55e; }
 .red { color: #ef4444; }
 
 .white {
-  color: #ccc;
+  color: #000000;
   font-size: 30px;
 }
 
@@ -44,7 +45,7 @@ body {
   display: flex;
   flex: 1;
   max-width: 650px;
-  background: #1c1c1c;
+  background: #e0e0e0;
   border-radius: 30px;
   overflow: hidden;
   border: 1px solid #333;
@@ -66,7 +67,7 @@ body {
   cursor: pointer;
   display: flex;
   align-items: center;
-  color: white;
+  color: black;
   font-size: 20px;
 }
 
@@ -96,15 +97,13 @@ body {
 ============================ */
 
 .news-wrapper {
-  background: #151515;
+  background: #e7e7e7;
   border-radius: 14px 0 0 14px;
   padding: 16px;
 }
 
-/* Featured article */
-
 .featured {
-  background: #1a1a1a;
+  background: #ffffff;
   border-radius: 12px;
   overflow: hidden;
   margin-bottom: 16px;
@@ -117,12 +116,12 @@ body {
 
 .featured h2 {
   font-size: 24px;
-  color: #fff;
+  color: rgb(0, 0, 0);
   margin: 12px 0 6px;
 }
 
 .featured p {
-  color: #aaa;
+  color: black;
   line-height: 1.4;
 }
 
@@ -135,26 +134,24 @@ body {
 }
 
 .news-card {
-  background: #1c1c1c;
+  background: #f4f4f4;
   padding: 12px;
   border-radius: 10px;
-  cursor: pointer;
-  transition: background 0.15s ease;
 }
 
 .news-card:hover {
-  background: #242424;
+  background: #ffffff;
 }
 
 .news-card h4 {
   font-size: 18px;
-  color: #eee;
+  color: black;
   margin-bottom: 6px;
 }
 
 .news-card p {
   font-size: 16px;
-  color: #aaa;
+  color: #4d4d4d;
 }
 
 /* ============================
@@ -162,14 +159,14 @@ body {
 ============================ */
 
 .stock-sidebar {
-  background: #151515;
+  background: rgb(235, 235, 235);
   border-radius: 0 14px 14px 0;
   padding: 16px;
 }
 
 .stock-sidebar h3 {
   font-size: 16px;
-  color: #fff;
+  color: black;
   margin: 18px 0 10px;
 }
 
@@ -184,7 +181,7 @@ body {
   justify-content: space-between;
   align-items: center;
   padding: 10px 0;
-  border-bottom: 1px solid #2a2a2a;
+  border-bottom: 1px solid #cdcdcd;
 }
 
 /* ============================
@@ -202,13 +199,14 @@ body {
 }
 
 .stock-change {
-  font-size: 13px;
+  font-size: 16px;
   font-weight: bold;
   margin-left: 6px;
 }
 
 .stock-change.up {
   color: #2ecc71;
+  font-size: 20px;
 }
 
 .stock-change.down {

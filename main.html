@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Stocks+ | Mua chứng khoán</title>
+
+    <!-- Bootstrap 5 -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+      crossorigin="anonymous"
+    />
+
+    <!-- Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+      integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+      body {
+        background: #f8f9fa;
+      }
+      .category-pill {
+        border-radius: 999px;
+        border: 1px solid #e0e0e0;
+        padding: 0.35rem 0.9rem;
+        font-size: 0.85rem;
+        cursor: pointer;
+        background-color: #fff;
+        transition: all 0.2s ease;
+      }
+      .category-pill.active {
+        background-color: #24b36b;
+        color: #fff;
+        border-color: #24b36b;
+      }
+      .product-card {
+        border: none;
+        border-radius: 1rem;
+        overflow: hidden;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+        transition: transform 0.18s ease, box-shadow 0.18s ease;
+        background-color: #fff;
+      }
+      .product-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+      }
+      .product-img-wrapper {
+        position: relative;
+        height: 180px;
+        overflow: hidden;
+      }
+      .product-img-wrapper img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .product-badge {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background: rgba(0, 0, 0, 0.7);
+        color: #fff;
+        font-size: 0.75rem;
+        padding: 0.15rem 0.5rem;
+        border-radius: 999px;
+      }
+      .cart-panel {
+        background-color: #fff;
+        border-radius: 1rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        padding: 1.25rem;
+        position: sticky;
+        top: 80px;
+      }
+      .cart-items {
+        max-height: 45vh;
+        overflow-y: auto;
+        padding-right: 0.5rem;
+      }
+      .cart-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.45rem 0;
+        border-bottom: 1px dashed #e5e7eb;
+      }
+      .cart-item:last-child {
+        border-bottom: none;
+      }
+      .cart-item img {
+        width: 46px;
+        height: 46px;
+        border-radius: 0.7rem;
+        object-fit: cover;
+      }
+      .cart-qty input {
+        width: 64px;
+        text-align: center;
+      }
+      .empty-cart {
+        text-align: center;
+        color: #9ca3af;
+        padding: 1.5rem 0;
+        font-size: 0.9rem;
+      }
+      .user-chip {
+        font-size: 0.85rem;
+        background-color: #fff;
+        border-radius: 999px;
+        padding: 0.2rem 0.75rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+      }
+    </style>
+  </head>
+
+  <body>
+    <nav class="navbar navbar-expand-lg bg-white shadow-sm sticky-top">
+      <div class="container">
+        <a
+          class="navbar-brand d-flex align-items-center gap-2"
+          href="./index.html"
+        >
+          <i class="fa-solid fa-chart-line text-success fs-4"></i>
+          <span>Stocks+</span>
+        </a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link" href="./index.html">Trang chủ</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" href="./main.html">Mua chứng khoán</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="./admin.html">Admin</a>
+            </li>
+          </ul>
+
+          <div class="d-flex align-items-center gap-3">
+            <span id="user-info" class="user-chip d-none">
+              <i class="fa-regular fa-user"></i>
+              <span id="user-name"></span>
+            </span>
+
+            <button
+              id="btn-login"
+              class="btn btn-outline-dark btn-sm"
+              type="button"
+            >
+              Đăng nhập
+            </button>
+            <button
+              id="btn-logout"
+              class="btn btn-dark btn-sm d-none"
+              type="button"
+            >
+              Đăng xuất
+            </button>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <main class="container py-4">
+      <section class="mb-4">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <div class="row g-3 align-items-center">
+              <div class="col-lg-6">
+                <div class="input-group">
+                  <span class="input-group-text bg-white">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                  </span>
+                  <input
+                    id="search-input"
+                    type="text"
+                    class="form-control"
+                    placeholder="Tìm theo mã/tên công ty (VD: AAPL)"
+                  />
+                </div>
+              </div>
+              <div class="col-lg-3">
+                <select id="sort-select" class="form-select">
+                  <option value="popular">Sắp xếp: Phổ biến</option>
+                  <option value="price-asc">Sắp xếp: Giá tăng dần</option>
+                  <option value="price-desc">Sắp xếp: Giá giảm dần</option>
+                  <option value="symbol-asc">Sắp xếp: Mã tăng dần</option>
+                </select>
+              </div>
+              <div class="col-lg-3 text-lg-end text-start">
+                <small class="text-muted">
+                  Dữ liệu lấy từ Firestore (collection `stocks`)
+                </small>
+              </div>
+            </div>
+
+            <div
+              class="mt-3 d-flex flex-wrap gap-2"
+              id="category-buttons"
+            ></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="row g-4">
+        <div class="col-lg-8">
+          <div class="row g-3" id="product-list"></div>
+          <div
+            id="product-empty"
+            class="alert alert-light border mt-3 d-none"
+            role="alert"
+          >
+            Không tìm thấy mã phù hợp.
+          </div>
+        </div>
+
+        <div class="col-lg-4">
+          <div class="cart-panel">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h5 class="mb-0">
+                <i class="fa-solid fa-bag-shopping text-success me-1"></i> Giỏ
+              </h5>
+              <span
+                id="cart-count-badge"
+                class="badge rounded-pill bg-dark-subtle text-dark"
+              >
+                0 cổ phiếu
+              </span>
+            </div>
+
+            <div id="cart-items" class="cart-items">
+              <div class="empty-cart">
+                Chưa có mã nào trong giỏ. Hãy chọn ở danh sách bên trái.
+              </div>
+            </div>
+
+            <div class="mt-3 border-top pt-3">
+              <div class="d-flex justify-content-between align-items-center">
+                <span class="text-muted small">Tạm tính</span>
+                <strong id="cart-subtotal">0đ</strong>
+              </div>
+              <div class="d-flex justify-content-between align-items-center mt-2">
+                <span class="fw-semibold">Tổng cộng</span>
+                <span class="fs-5 fw-bold text-primary" id="cart-total"
+                  >0đ</span
+                >
+              </div>
+
+              <button
+                id="btn-checkout"
+                class="btn btn-primary w-100 mt-3"
+                type="button"
+              >
+                Mua ngay
+              </button>
+              <small class="d-block text-muted mt-1">
+                * Đơn mua sẽ được lưu vào Firestore (collection `orders`)
+              </small>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="mt-4">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h5 class="card-title mb-2">
+              <i class="fa-solid fa-receipt me-1"></i> Đơn mua của bạn
+            </h5>
+            <div class="table-responsive">
+              <table class="table table-sm align-middle mb-0">
+                <thead>
+                  <tr>
+                    <th>Mã</th>
+                    <th>Thời gian</th>
+                    <th>Tổng tiền</th>
+                    <th>Trạng thái</th>
+                  </tr>
+                </thead>
+                <tbody id="orders-table-body"></tbody>
+              </table>
+            </div>
+            <div
+              id="orders-empty"
+              class="text-center text-muted py-3 d-none"
+            >
+              Bạn chưa có đơn mua nào.
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Chart modal -->
+    <div
+      class="modal fade"
+      id="chartModal"
+      tabindex="-1"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="chartModalTitle">Biểu đồ</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div
+              id="chartError"
+              class="alert alert-danger d-none"
+              role="alert"
+            ></div>
+            <div class="position-relative">
+              <canvas id="stockChartCanvas" style="height: 420px"></canvas>
+            </div>
+            <small id="chartHint" class="text-muted d-block mt-2">
+              Chart lấy từ AlphaVantage (TIME_SERIES_DAILY).
+            </small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+      crossorigin="anonymous"
+    ></script>
+
+    <script type="module" src="./src/js/stocks-shop.js"></script>
+  </body>
+</html>
+

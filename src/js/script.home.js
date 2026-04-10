@@ -2,8 +2,32 @@
 // script.home.js (ALPHA ONLY)
 // ------------------------
 
-const ALPHA_KEY = "YOUR_ALPHA_KEY";
+function getAlphaVantageKey() {
+  const params = new URLSearchParams(window.location.search);
+  return (
+    params.get("apikey") ||
+    localStorage.getItem("alphavantage_apikey") ||
+    "YGKIL06O3DLJJT7J"
+  );
+}
+
+const ALPHA_KEY = getAlphaVantageKey();
 let chart = null;
+
+function showApiError(message) {
+  const el = document.getElementById("api-error");
+  if (!el) return;
+  el.textContent = message;
+  el.style.display = "block";
+}
+
+function requireAlphaKey() {
+  if (ALPHA_KEY) return true;
+  showApiError(
+    "Thiếu AlphaVantage API key. Vui lòng thêm tham số `?apikey=...` hoặc lưu vào localStorage theo key `alphavantage_apikey`."
+  );
+  return false;
+}
 
 
 // -----------------------------------------------------
@@ -24,6 +48,7 @@ function prepareChartCanvas() {
 // ------------------------
 async function loadNews() {
   try {
+    if (!requireAlphaKey()) return;
     const res = await fetch(
       `https://www.alphavantage.co/query?function=NEWS_SENTIMENT&topics=finance&apikey=${ALPHA_KEY}`
     );
@@ -66,6 +91,7 @@ async function loadNews() {
 // ------------------------
 async function loadMovers() {
   try {
+    if (!requireAlphaKey()) return;
     const res = await fetch(
       `https://www.alphavantage.co/query?function=TOP_GAINERS_LOSERS&apikey=${ALPHA_KEY}`
     );
@@ -109,7 +135,7 @@ function fillList(id, arr) {
       if (Number.isNaN(percent)) percent = 0;
       percent = Math.max(Math.min(percent, 999), -999);
 
-      const cls = percent >= 0 ? "green-text" : "red";
+      const cls = percent >= 0 ? "green" : "red";
       const arrow = percent >= 0 ? "▲" : "▼";
 
       el.insertAdjacentHTML(
@@ -144,7 +170,6 @@ async function getStock() {
 
   const featured = document.getElementById("featured");
 
-  // Replace ONLY the headline article
   featured.innerHTML = `
     <h2>Loading ${symbol}...</h2>
     <canvas id="stockChart"></canvas>
@@ -154,6 +179,7 @@ async function getStock() {
   const info = document.getElementById("info");
 
   try {
+    if (!requireAlphaKey()) return;
     const res = await fetch(
       `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${symbol}&apikey=${ALPHA_KEY}`
     );
@@ -205,6 +231,7 @@ async function getStock() {
 
 async function loadStockNews(symbol) {
   try {
+    if (!requireAlphaKey()) return;
     const res = await fetch(
       `https://www.alphavantage.co/query?function=NEWS_SENTIMENT&tickers=${symbol}&apikey=${ALPHA_KEY}`
     );

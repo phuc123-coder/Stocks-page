@@ -1,25 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login • Finance++</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<title>Login</title>
+<link rel="stylesheet" href="./src/css/auth.css">
 </head>
-<body class="auth-body">
-  <div class="auth-container">
-    <h2>Login</h2>
-    <form id="loginForm">
-      <label>Email</label>
-      <input type="email" id="loginEmail" required>
-      
-      <label>Password</label>
-      <input type="password" id="loginPassword" required>
-      
-      <button type="submit">Login</button>
-    </form>
-    <p>Don’t have an account? <a href="signup.html">Sign up</a></p>
-  </div>
-  <script src="auth.js"></script>
+
+<body>
+
+<div class="auth-container">
+<h2>Login</h2>
+
+<input type="text" id="email" placeholder="Email or Username">
+<input type="password" id="password" placeholder="Password">
+
+<button id="loginBtn">Login</button>
+
+<div class="divider">OR</div>
+
+<button class="google" id="googleLogin">Login with Google</button>
+<button class="github" id="githubLogin">Login with GitHub</button>
+
+<p>No account? <a href="signup.html">Sign up</a></p>
+
+</div>
+
+<script type="module" src="./src/js/auth.js"></script>
+
 </body>
 </html>
