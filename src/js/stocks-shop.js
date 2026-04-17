@@ -102,9 +102,9 @@ function getFilteredStocks() {
 function getAlphaVantageKey() {
   const params = new URLSearchParams(window.location.search);
   return (
-    params.get("apikey") ||
-    localStorage.getItem("alphavantage_apikey") ||
-    ""
+    params.get("YGKIL06O3DLJJT7J ") ||
+    localStorage.getItem("YGKIL06O3DLJJT7J ") ||
+    "YGKIL06O3DLJJT7J"
   );
 }
 

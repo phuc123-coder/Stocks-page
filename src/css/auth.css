@@ -6,10 +6,7 @@ justify-content:center;
 align-items:center;
 height:100vh;
 margin:0;
-}  
-      .form-card {
-        border-radius: 0.75rem;
-      }
+}
 
 .auth-container{
 background:white;

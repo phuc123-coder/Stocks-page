@@ -204,11 +204,12 @@ body {
   margin-left: 6px;
 }
 
-.stock-change.up {
+.green {
   color: #2ecc71;
   font-size: 20px;
 }
 
-.stock-change.down {
+.red {
   color: #e74c3c;
+  font-size: 20px;
 }
